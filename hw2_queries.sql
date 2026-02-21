@@ -1,21 +1,19 @@
--- Homework 2: EN.601.415
+-- Homework 2: EN.601.415 Databases
 -- Joanne Li (jli460)
 
--- QUERIES --
-
--- Question 1: Recent movies
+SELECT '--- Question 1: Recent Movies ---';
 SELECT Title, Director
 FROM Movies
 WHERE Year = 2023
 ORDER BY Title DESC;
 
--- Question 2: Movies by James
+SELECT '--- Question 2: Movies by James ---';
 SELECT *
 FROM Movies
 WHERE (Year > 2022 OR Year < 2000)
   AND Director LIKE '%James%';
 
--- Question 3: Good years for movies
+SELECT '--- Question 3: Good Years for Movies ---';
 SELECT DISTINCT Year
 FROM Movies
 WHERE MovieID IN (
@@ -25,14 +23,14 @@ WHERE MovieID IN (
 )
 ORDER BY Year ASC;
 
--- Question 4: Easier to read Ratings
+SELECT '--- Question 4: Easier to Read Ratings ---';
 SELECT R.Name AS ReviewerName, M.Title AS MovieTitle, Ra.Stars, Ra.RatingDate
 FROM Ratings Ra
 JOIN Reviewers R ON Ra.ReviewerID = R.ReviewerID
 JOIN Movies M ON Ra.MovieID = M.MovieID
 ORDER BY R.Name, M.Title, Ra.Stars;
 
--- Question 5: Movies with poor coverage
+SELECT '--- Question 5: Movies with Poor Coverage ---';
 SELECT Title
 FROM Movies
 WHERE MovieID NOT IN (
@@ -40,33 +38,33 @@ WHERE MovieID NOT IN (
     FROM Ratings
 );
 
--- Question 6: Harshest ratings
+SELECT '--- Question 6: Harshest Ratings ---';
 SELECT Ra.ReviewerID, R.Name, Ra.MovieID, M.Title, Ra.Stars
 FROM Ratings Ra
 JOIN Reviewers R ON Ra.ReviewerID = R.ReviewerID
 JOIN Movies M ON Ra.MovieID = M.MovieID
 WHERE Ra.Stars = (SELECT MIN(Stars) FROM Ratings);
 
--- Question 7: Best ratings per movie
+SELECT '--- Question 7: Best Ratings per Movie ---';
 SELECT MovieID, MAX(Stars) AS HighestStars
 FROM Ratings
 GROUP BY MovieID;
 
--- Question 8: Keep the best, ignore the rest
+SELECT '--- Question 8: Keep the Best, Ignore the Rest ---';
 SELECT M.Title, MAX(Ra.Stars) AS HighestStars
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
 GROUP BY M.MovieID, M.Title
 ORDER BY M.Title ASC;
 
--- Question 9: Power users
+SELECT '--- Question 9: Power Users ---';
 SELECT R.Name, COUNT(*) AS TotalReviews
 FROM Ratings Ra
 JOIN Reviewers R ON Ra.ReviewerID = R.ReviewerID
 GROUP BY Ra.ReviewerID, R.Name
 HAVING COUNT(*) >= 3;
 
--- Question 10: Real power users
+SELECT '--- Question 10: Real Power Users ---';
 SELECT R.ReviewerID, R.Name
 FROM Reviewers R
 WHERE NOT EXISTS (
@@ -80,7 +78,7 @@ WHERE NOT EXISTS (
     )
 );
 
--- Question 11: What to watch
+SELECT '--- Question 11: What to Watch ---';
 SELECT M.Title
 FROM Movies M
 WHERE M.MovieID NOT IN (
@@ -90,21 +88,21 @@ WHERE M.MovieID NOT IN (
     WHERE R.Name = 'Chris Jackson'
 );
 
--- Question 12: Actor directors
+SELECT '--- Question 12: Actor Directors ---';
 SELECT DISTINCT P.Name
 FROM People P
 JOIN Actors_Movies AM ON P.PersonID = AM.ActorID
 JOIN Movies M ON AM.MovieID = M.MovieID
 WHERE M.Director = P.Name;
 
--- Question 13: Actor, director, reviewer
+SELECT '--- Question 13: Actor, Director, Reviewer ---';
 SELECT DISTINCT R.ReviewerID, R.Name
 FROM Reviewers R
 JOIN People P ON R.Name = P.Name
 JOIN Actors_Movies AM ON P.PersonID = AM.ActorID
 JOIN Movies M ON M.Director = P.Name;
 
--- Question 14: Conflicts of interest
+SELECT '--- Question 14: Conflicts of Interest ---';
 SELECT DISTINCT R.ReviewerID, R.Name
 FROM Reviewers R
 JOIN People P ON R.Name = P.Name
@@ -112,7 +110,7 @@ JOIN Actors_Movies AM ON P.PersonID = AM.ActorID
 JOIN Ratings Ra ON R.ReviewerID = Ra.ReviewerID
   AND AM.MovieID = Ra.MovieID;
 
--- Question 15: Only good directors
+SELECT '--- Question 15: Only Good Directors ---';
 SELECT DISTINCT Director
 FROM Movies
 WHERE Director NOT IN (
@@ -122,7 +120,7 @@ WHERE Director NOT IN (
     WHERE Ra.Stars < 4
 );
 
--- Question 16: No rating actors and movies
+SELECT '--- Question 16: No Rating Actors and Movies ---';
 SELECT DISTINCT P.Name, AM.Role, M.Title
 FROM Actors_Movies AM
 JOIN People P ON AM.ActorID = P.PersonID
@@ -131,7 +129,7 @@ WHERE M.MovieID NOT IN (
     SELECT MovieID FROM Ratings
 );
 
--- Question 17: Movie with highest average rating
+SELECT '--- Question 17: Movie with Highest Average Rating ---';
 SELECT M.Title, AVG(Ra.Stars) AS AvgRating
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
@@ -145,7 +143,7 @@ HAVING AVG(Ra.Stars) = (
     ) AS Averages
 );
 
--- Question 18: Chris reviews
+SELECT '--- Question 18: Chris Reviews ---';
 SELECT M.MovieID, M.Title, COUNT(*) AS NumReviews
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
@@ -153,7 +151,7 @@ JOIN Reviewers R ON Ra.ReviewerID = R.ReviewerID
 WHERE R.Name LIKE '%Chris%'
 GROUP BY M.MovieID, M.Title;
 
--- Question 19: Top rated movies
+SELECT '--- Question 19: Top Rated Movies ---';
 SELECT M.Title, M.Year, M.Director
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
@@ -167,7 +165,7 @@ HAVING AVG(Ra.Stars) = (
     ) AS Averages
 );
 
--- Question 20: Frequent collaborations
+SELECT '--- Question 20: Frequent Collaborations ---';
 SELECT AM.ActorID, P.Name AS ActorName, M.Director, COUNT(*) AS NumMovies
 FROM Actors_Movies AM
 JOIN Movies M ON AM.MovieID = M.MovieID
@@ -176,7 +174,7 @@ GROUP BY AM.ActorID, P.Name, M.Director
 ORDER BY NumMovies DESC
 LIMIT 1;
 
--- Question 21: Director averages
+SELECT '--- Question 21: Director Averages ---';
 SELECT M.Director, AVG(Ra.Stars) AS AvgRating
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
@@ -184,7 +182,7 @@ GROUP BY M.Director
 HAVING COUNT(DISTINCT M.MovieID) >= 2
 ORDER BY AvgRating DESC;
 
--- Question 22: Versatile actors
+SELECT '--- Question 22: Versatile Actors ---';
 SELECT P.Name, COUNT(DISTINCT AM.MovieID) AS NumMovies, COUNT(DISTINCT AM.Role) AS NumRoles
 FROM Actors_Movies AM
 JOIN People P ON AM.ActorID = P.PersonID
@@ -192,20 +190,20 @@ GROUP BY AM.ActorID, P.Name
 HAVING COUNT(DISTINCT AM.MovieID) >= 3
    AND COUNT(DISTINCT AM.Role) >= 2;
 
--- Question 23: John directors 2022
+SELECT '--- Question 23: John Directors 2022 ---';
 SELECT Title, Director
 FROM Movies
 WHERE Year = 2022
   AND Director LIKE 'John %';
 
--- Question 24: Prolific actors
+SELECT '--- Question 24: Prolific Actors ---';
 SELECT P.Name, COUNT(DISTINCT AM.MovieID) AS NumMovies
 FROM Actors_Movies AM
 JOIN People P ON AM.ActorID = P.PersonID
 GROUP BY AM.ActorID, P.Name
 HAVING COUNT(DISTINCT AM.MovieID) >= 10;
 
--- Question 26 (L2): Acting only in good movies
+SELECT '--- Question 26 (L2): Acting Only in Good Movies ---';
 SELECT DISTINCT P.Name
 FROM People P
 JOIN Actors_Movies AM ON P.PersonID = AM.ActorID
@@ -222,7 +220,7 @@ AND P.PersonID NOT IN (
     WHERE Ra2.Stars < 3
 );
 
--- Question 27 (L2): Co-star actors
+SELECT '--- Question 27 (L2): Co-star Actors ---';
 SELECT A1.ActorID AS Actor1ID, P1.Name AS Actor1Name,
        A2.ActorID AS Actor2ID, P2.Name AS Actor2Name,
        COUNT(*) AS NumMovies
@@ -233,7 +231,7 @@ JOIN People P2 ON A2.ActorID = P2.PersonID
 GROUP BY A1.ActorID, P1.Name, A2.ActorID, P2.Name
 HAVING COUNT(*) >= 3;
 
--- Question 28 (L2): Co-lead movies
+SELECT '--- Question 28 (L2): Co-lead Movies ---';
 SELECT DISTINCT M.MovieID, M.Title
 FROM Movies M
 JOIN Actors_Movies AM ON M.MovieID = AM.MovieID
@@ -243,7 +241,7 @@ GROUP BY M.MovieID, M.Title
 HAVING COUNT(DISTINCT AM.ActorID) >= 2
    AND AVG(Ra.Stars) >= 4;
 
--- Question 29 (L2): Late Bloomers
+SELECT '--- Question 29 (L2): Late Bloomers ---';
 SELECT R.Name
 FROM Reviewers R
 WHERE (
@@ -261,7 +259,7 @@ AND (
     LIMIT 1
 ) IN (4, 5);
 
--- Question 30 (L2): Complete Spielberg reviews
+SELECT '--- Question 30 (L2): Complete Spielberg Reviews ---';
 SELECT R.Name
 FROM Reviewers R
 WHERE NOT EXISTS (
@@ -276,7 +274,7 @@ WHERE NOT EXISTS (
       )
 );
 
--- Question 31 (L2): No five-star reviewers
+SELECT '--- Question 31 (L2): No Five-Star Reviewers ---';
 SELECT R.ReviewerID, R.Name
 FROM Reviewers R
 WHERE R.ReviewerID NOT IN (
@@ -285,7 +283,7 @@ WHERE R.ReviewerID NOT IN (
     WHERE Stars = 5
 );
 
--- Question 32 (L2): One-hit directors
+SELECT '--- Question 32 (L2): One-hit Directors ---';
 SELECT M.Director, M.Title
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
@@ -298,14 +296,14 @@ WHERE Ra.Stars = 5
   )
 GROUP BY M.Director, M.Title;
 
--- Question 33 (L2): Director statistics
+SELECT '--- Question 33 (L2): Director Statistics ---';
 SELECT M.Director, COUNT(DISTINCT M.MovieID) AS NumMovies, AVG(Ra.Stars) AS AvgRating
 FROM Movies M
 JOIN Ratings Ra ON M.MovieID = Ra.MovieID
 GROUP BY M.Director
 HAVING COUNT(DISTINCT M.MovieID) >= 2;
 
--- Question 34 (L2): Highly rated actors
+SELECT '--- Question 34 (L2): Highly Rated Actors ---';
 SELECT P.Name, COUNT(DISTINCT AM.MovieID) AS HighlyRatedMovies
 FROM People P
 JOIN Actors_Movies AM ON P.PersonID = AM.ActorID
@@ -318,7 +316,7 @@ JOIN (
 GROUP BY P.PersonID, P.Name
 HAVING COUNT(DISTINCT AM.MovieID) >= 3;
 
--- Question 35 (L2): Most active actors
+SELECT '--- Question 35 (L2): Most Active Actors ---';
 SELECT P.Name, COUNT(DISTINCT AM.MovieID) AS NumMovies
 FROM Actors_Movies AM
 JOIN People P ON AM.ActorID = P.PersonID
@@ -332,10 +330,7 @@ HAVING COUNT(DISTINCT AM.MovieID) = (
     ) AS Counts
 );
 
--- Question 36 (L2): Original question
--- (Reviewers who improved over time) Find reviewers whose average rating
--- in their second half of reviews (by date) is strictly higher than in
--- their first half. Uses window functions with aggregation and ordering.
+SELECT '--- Question 36 (L2): Reviewers Who Improved Over Time ---';
 SELECT R.Name
 FROM Reviewers R
 JOIN (
